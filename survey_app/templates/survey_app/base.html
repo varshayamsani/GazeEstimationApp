@@ -23,12 +23,6 @@
   data-record-webcam="{{ record_webcam|default:False|yesno:'1,0' }}"
   data-reset-capture-session="{{ reset_capture_session|default:False|yesno:'1,0' }}"
 >
-  <div id="realeyeSyncScreen" class="realeye-sync-screen" role="status" aria-live="polite">
-    <div class="realeye-sync-content">
-      <p>Look at the center dot</p>
-      <div class="realeye-sync-dot" aria-hidden="true"></div>
-    </div>
-  </div>
   <header class="topbar">
     <div class="brand">Sentiment Analysis Study</div>
   </header>
@@ -39,46 +33,5 @@
   {% if load_survey_js != False %}
     <script src="{% static 'survey_app/js/survey.js' %}?v=20260325-1"></script>
   {% endif %}
-  <script>
-    (function() {
-      const syncKey = "realeyeSyncPointShown";
-      const syncScreen = document.getElementById("realeyeSyncScreen");
-
-      function startNextRealEyeExposure() {
-        if (!window.reSdk || typeof window.reSdk.startNextExposure !== "function") {
-          return;
-        }
-
-        try {
-          window.reSdk.startNextExposure();
-        } catch (error) {
-          console.warn("RealEye exposure could not be advanced.", error);
-        }
-      }
-
-      function hideSyncScreen() {
-        if (syncScreen) {
-          syncScreen.classList.add("is-hidden");
-        }
-      }
-
-      window.addEventListener("load", function() {
-        if (!syncScreen) {
-          return;
-        }
-
-        if (window.sessionStorage.getItem(syncKey) === "1") {
-          hideSyncScreen();
-          return;
-        }
-
-        window.setTimeout(function() {
-          window.sessionStorage.setItem(syncKey, "1");
-          hideSyncScreen();
-          startNextRealEyeExposure();
-        }, 3000);
-      });
-    })();
-  </script>
 </body>
 </html>
