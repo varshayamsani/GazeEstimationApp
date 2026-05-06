@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Capture Session</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'survey_app/css/styles.css' %}">
+</head>
+<body class="capture-window">
+  <main class="capture-window-shell">
+    <section class="card capture-window-card">
+      <h1>Recording Session</h1>
+      <p>Keep this window open while completing the survey.</p>
+      <p>Select the full screen or the main survey window when the browser asks what to share. Do not select this small recording popup.</p>
+      <p id="captureStatus" class="status">Requesting webcam and screen-share access...</p>
+    </section>
+  </main>
+  <script src="{% static 'survey_app/js/capture_session.js' %}?v=20260401-5"></script>
+</body>
+</html>

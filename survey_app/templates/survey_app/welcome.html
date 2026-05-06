@@ -1,0 +1,14 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="card intake-card intake-hero">
+  <h1>Welcome to the Sentiment Analysis Study</h1>
+  <p class="lead">
+    You will complete a short intake, review the study disclaimer, and then begin the experiment.
+    The next few screens collect participant background information required for the study.
+  </p>
+  <div class="intake-actions">
+    <a href="{% url 'survey_app:consent' %}" class="btn">Continue</a>
+  </div>
+</section>
+{% endblock %}

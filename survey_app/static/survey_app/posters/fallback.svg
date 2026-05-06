@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="520" viewBox="0 0 360 520" role="img" aria-label="Movie poster unavailable">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2c3e50"/>
+      <stop offset="100%" stop-color="#4ca1af"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="520" fill="url(#bg)"/>
+  <rect x="24" y="24" width="312" height="472" fill="none" stroke="#ffffff" stroke-opacity="0.45"/>
+  <text x="180" y="250" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#ffffff">Poster</text>
+  <text x="180" y="288" font-family="Arial, sans-serif" font-size="28" text-anchor="middle" fill="#ffffff">Unavailable</text>
+</svg>

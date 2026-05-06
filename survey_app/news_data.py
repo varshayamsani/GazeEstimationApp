@@ -1,0 +1,86 @@
+import csv
+from pathlib import Path
+import re
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+FNC_DIR = BASE_DIR / "data" / "fnc-1"
+MAX_WORDS = 150
+
+
+def slugify(value: str) -> str:
+    value = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return value[:60] or "headline"
+
+
+def truncate_words(text: str, limit: int = MAX_WORDS) -> str:
+    words = text.split()
+    if len(words) <= limit:
+        return text
+    return " ".join(words[:limit]).rstrip(" ,;:") + "..."
+
+
+def normalize_text(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def build_summary(text: str, limit: int = 24) -> str:
+    words = text.split()
+    if len(words) <= limit:
+        return text
+    return " ".join(words[:limit]).rstrip(" ,;:") + "..."
+
+
+def load_bodies() -> dict[str, str]:
+    with (FNC_DIR / "train_bodies.csv").open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        return {
+            row["Body ID"]: truncate_words(normalize_text(row["articleBody"]))
+            for row in reader
+        }
+
+
+def build_news_articles() -> list[dict]:
+    bodies = load_bodies()
+    desired_stances = ["agree", "disagree", "discuss", "discuss", "unrelated", "unrelated"]
+    collected: list[dict] = []
+    used_pairs: set[tuple[str, str]] = set()
+
+    with (FNC_DIR / "train_stances.csv").open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+
+    search_start = 0
+    for desired_stance in desired_stances:
+        for idx in range(search_start, len(rows)):
+            row = rows[idx]
+            if row["Stance"] != desired_stance:
+                continue
+            body_id = row["Body ID"]
+            headline = normalize_text(row["Headline"])
+            body = bodies.get(body_id, "")
+            if not body or len(body.split()) < 60:
+                continue
+            pair = (headline, body_id)
+            if pair in used_pairs:
+                continue
+
+            used_pairs.add(pair)
+            collected.append(
+                {
+                    "slug": f"{slugify(headline)}-{body_id}",
+                    "headline": headline,
+                    "source": "FNC-1",
+                    "summary": build_summary(body),
+                    "body": body,
+                    "stance": desired_stance,
+                    "is_fake": False,
+                }
+            )
+            search_start = idx + 1
+            break
+
+    return collected
+
+
+NEWS_ARTICLES = build_news_articles()

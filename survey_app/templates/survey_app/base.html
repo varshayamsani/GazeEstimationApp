@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sentiment Analysis Study</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'survey_app/css/styles.css' %}?v=20260422-1">
+  <script type="module">
+    import EmbeddedPageSdk from "https://app.realeye.io/sdk/js/testRunnerEmbeddableSdk-latest.js";
+
+    window.addEventListener("DOMContentLoaded", function() {
+      const debugMode = false;
+      const stimulusId = null;
+      const forceRun = false;
+
+      window.reSdk = new EmbeddedPageSdk(debugMode, stimulusId, forceRun);
+      window.RealEye = window.reSdk;
+    });
+  </script>
+</head>
+<body
+  data-record-webcam="{{ record_webcam|default:False|yesno:'1,0' }}"
+  data-reset-capture-session="{{ reset_capture_session|default:False|yesno:'1,0' }}"
+>
+  <div id="realeyeSyncScreen" class="realeye-sync-screen" role="status" aria-live="polite">
+    <div class="realeye-sync-content">
+      <p>Look at the center dot</p>
+      <div class="realeye-sync-dot" aria-hidden="true"></div>
+    </div>
+  </div>
+  <header class="topbar">
+    <div class="brand">Sentiment Analysis Study</div>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+  {% if load_survey_js != False %}
+    <script src="{% static 'survey_app/js/survey.js' %}?v=20260325-1"></script>
+  {% endif %}
+  <script>
+    (function() {
+      const syncKey = "realeyeSyncPointShown";
+      const syncScreen = document.getElementById("realeyeSyncScreen");
+
+      function startNextRealEyeExposure() {
+        if (!window.reSdk || typeof window.reSdk.startNextExposure !== "function") {
+          return;
+        }
+
+        try {
+          window.reSdk.startNextExposure();
+        } catch (error) {
+          console.warn("RealEye exposure could not be advanced.", error);
+        }
+      }
+
+      function hideSyncScreen() {
+        if (syncScreen) {
+          syncScreen.classList.add("is-hidden");
+        }
+      }
+
+      window.addEventListener("load", function() {
+        if (!syncScreen) {
+          return;
+        }
+
+        if (window.sessionStorage.getItem(syncKey) === "1") {
+          hideSyncScreen();
+          return;
+        }
+
+        window.setTimeout(function() {
+          window.sessionStorage.setItem(syncKey, "1");
+          hideSyncScreen();
+          startNextRealEyeExposure();
+        }, 3000);
+      });
+    })();
+  </script>
+</body>
+</html>

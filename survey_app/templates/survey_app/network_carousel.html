@@ -1,0 +1,33 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="grid-layout article-list-page single-column">
+  <div>
+    <h1>Task 3: Network Diagram Interpretation</h1>
+    {% if progress.minimum_met %}
+      <p>You have completed the required 3 network-diagram responses. You can still answer another diagram if one remains.</p>
+    {% else %}
+      <p>Review at least 3 visuals. There are 6 available items: 3 word clouds and 3 node-link diagrams, and you will answer one at a time.</p>
+      <p class="progress-note">{{ progress.remaining_required }} required diagram{{ progress.remaining_required|pluralize }} remaining.</p>
+    {% endif %}
+
+    {% if diagrams %}
+      <div class="article-selection-grid">
+        {% for diagram in diagrams %}
+          <a class="article-selection-card card" href="{% url 'survey_app:network_questions' diagram.id %}">
+            <span class="article-source">Node-Link Diagram</span>
+            <strong>{{ diagram.title }}</strong>
+            <p>{{ diagram.context }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state card">
+        <h2>No more diagrams left</h2>
+        <p>You have finished the network interpretation task.</p>
+        <a class="btn btn-secondary" href="{% url 'survey_app:next_task' %}">Continue</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

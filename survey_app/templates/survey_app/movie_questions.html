@@ -1,0 +1,42 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="question-stage">
+  <p class="stage-kicker">{{ movie.title }} ({{ movie.year }})</p>
+
+  <form method="post" class="question-form card">
+    {% csrf_token %}
+    {% if error_message %}
+      <p class="error">{{ error_message }}</p>
+    {% endif %}
+
+    <div class="question-block large">
+      <h2>What is the sentiment of the review that you just read?</h2>
+      <div class="option-row large">
+        <label><input type="radio" name="sentiment_choice" value="positive" {% if selected_sentiment == "positive" %}checked{% endif %}> Positive</label>
+        <label><input type="radio" name="sentiment_choice" value="neutral" {% if selected_sentiment == "neutral" %}checked{% endif %}> Neutral</label>
+        <label><input type="radio" name="sentiment_choice" value="negative" {% if selected_sentiment == "negative" %}checked{% endif %}> Negative</label>
+      </div>
+    </div>
+
+    <div class="question-block large">
+      <h2>Based on the review excerpts, what overall rating do they suggest for this movie?</h2>
+      <input id="ratingChoiceInput" type="hidden" name="rating_choice" value="{{ selected_rating|default:'' }}">
+      <div class="star-rating-wrap large">
+        <div
+          id="starRating"
+          class="star-rating large"
+          role="slider"
+          aria-label="Star rating"
+          data-initial-rating="{{ selected_rating|default:'' }}"
+        ></div>
+        <span id="ratingValue" class="rating-value large">
+          {% if selected_rating %}{{ selected_rating }} / 5.0{% else %}0.0 / 5.0{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn">Submit Response</button>
+  </form>
+</section>
+{% endblock %}

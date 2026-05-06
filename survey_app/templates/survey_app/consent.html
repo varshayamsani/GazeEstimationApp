@@ -1,0 +1,34 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="card intake-card">
+  <p class="eyebrow">Step 1 of 3</p>
+  <h1>Disclaimer and Consent</h1>
+  <p>
+    During this study, your webcam feed and screen activity may be recorded for research purposes
+    while you complete the experiment tasks. Recorded clips are used only for study analysis.
+  </p>
+  <p>
+    Participation is voluntary. You may stop at any point before beginning the experiment. By
+    continuing below, you confirm that you understand the recording setup and consent to
+    participate in the study.
+  </p>
+
+  <form method="post" class="stack-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="field">
+      {{ form.participant_tag.label_tag }}
+      {{ form.participant_tag }}
+      {% for error in form.participant_tag.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="field checkbox-field">{{ form.consent }} {{ form.consent.label_tag }}</div>
+    {% for error in form.consent.errors %}
+      <div class="error">{{ error }}</div>
+    {% endfor %}
+    <button type="submit" class="btn">Agree and Continue</button>
+  </form>
+</section>
+{% endblock %}

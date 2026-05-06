@@ -1,0 +1,19 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="card next-task-card">
+  <h1>Response Submitted</h1>
+  <p>Your network-diagram responses have been saved.</p>
+  {% if has_more_diagrams %}
+    {% if minimum_met %}
+      <a class="btn" href="{% url 'survey_app:network_carousel' %}">Go to next diagram</a>
+      <a class="btn btn-secondary" href="{% url 'survey_app:next_task' %}">Finish study</a>
+    {% else %}
+      <a class="btn" href="{% url 'survey_app:network_carousel' %}">Go to next diagram</a>
+    {% endif %}
+  {% else %}
+    <p>You have completed the network interpretation task.</p>
+    <a class="btn btn-secondary" href="{% url 'survey_app:next_task' %}">Finish study</a>
+  {% endif %}
+</section>
+{% endblock %}

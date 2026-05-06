@@ -1,0 +1,31 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="card intake-card">
+  <p class="eyebrow">Step 3 of 4</p>
+  <h1>Reading and Media Habits</h1>
+  <form method="post" class="stack-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="field">
+      <span class="field-label">{{ form.reads_words_daily.label }}</span>
+      <div class="choice-list">
+        {{ form.reads_words_daily }}
+      </div>
+      {% for error in form.reads_words_daily.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="field">
+      <span class="field-label">{{ form.reads_news_daily.label }}</span>
+      <div class="choice-list inline-choices">
+        {{ form.reads_news_daily }}
+      </div>
+      {% for error in form.reads_news_daily.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn">Continue</button>
+  </form>
+</section>
+{% endblock %}

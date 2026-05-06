@@ -1,0 +1,41 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="card intake-card">
+  <p class="eyebrow">Step 2 of 3</p>
+  <h1>Participant Demographics</h1>
+  <form method="post" class="stack-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="field">
+      {{ form.age.label_tag }}
+      {{ form.age }}
+      {% for error in form.age.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="field">
+      {{ form.profession.label_tag }}
+      {{ form.profession }}
+      {% for error in form.profession.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="field">
+      {{ form.education_level.label_tag }}
+      {{ form.education_level }}
+      {% for error in form.education_level.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="field">
+      {{ form.gender.label_tag }}
+      {{ form.gender }}
+      {% for error in form.gender.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn">Continue</button>
+  </form>
+</section>
+{% endblock %}

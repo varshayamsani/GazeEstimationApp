@@ -1,0 +1,14 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="card next-task-card">
+  <h1>Review Submitted</h1>
+  <p>Your response has been saved.</p>
+  {% if minimum_met %}
+    <a class="btn" href="{% url 'survey_app:carousel' %}">Review another movie</a>
+    <a class="btn btn-secondary" href="{% url 'survey_app:next_task' %}">Move to the next task</a>
+  {% else %}
+    <a class="btn" href="{% url 'survey_app:carousel' %}">Next</a>
+  {% endif %}
+</section>
+{% endblock %}

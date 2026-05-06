@@ -1,0 +1,32 @@
+{% extends "survey_app/base.html" %}
+
+{% block content %}
+<section class="grid-layout article-list-page single-column">
+  <div>
+    <h1>Task 2: Headline-Article Relation</h1>
+    {% if progress.minimum_met %}
+      <p>You have completed the required 3 article classifications. You can classify another headline-body pair one at a time.</p>
+    {% else %}
+      <p>Review at least 3 items. Read the headline and article text, then classify their relationship.</p>
+      <p class="progress-note">{{ progress.remaining_required }} required article{{ progress.remaining_required|pluralize }} remaining.</p>
+    {% endif %}
+
+    {% if articles %}
+      <div class="article-selection-grid">
+        {% for article in articles %}
+          <a class="article-selection-card card" href="{% url 'survey_app:news_detail' article.id %}">
+            <span class="article-source">{{ article.source }}</span>
+            <strong>{{ article.headline }}</strong>
+            <p>{{ article.summary }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state card">
+        <h2>No more news articles left</h2>
+        <p>You have finished the news classification task.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
