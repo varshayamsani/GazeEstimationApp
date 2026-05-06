@@ -1,10 +1,11 @@
+import os
 from pathlib import Path
 import socket
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "change-me-in-production"
-DEBUG = True
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "change-me-in-production")
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() == "true"
 # Local development hostnames and addresses we expect to use while testing
 # from the same machine, WSL host, or another device on the LAN.
 ALLOWED_HOSTS = [
@@ -13,8 +14,13 @@ ALLOWED_HOSTS = [
     "0.0.0.0",
     "[::1]",
     "172.17.41.28",
+    "172.16.203.16",
     ".trycloudflare.com",
 ]
+extra_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "")
+if extra_hosts:
+    ALLOWED_HOSTS.extend([host.strip() for host in extra_hosts.split(",") if host.strip()])
+
 CSRF_TRUSTED_ORIGINS = [
     "https://*.trycloudflare.com",
 ]
@@ -82,6 +88,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = []
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
