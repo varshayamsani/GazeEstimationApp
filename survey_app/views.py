@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import subprocess
+import time
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, JsonResponse
@@ -136,9 +137,6 @@ def append_chunk_to_media_file(uploaded_clip, relative_path: str) -> None:
 
 def convert_webm_to_mp4(relative_webm_path: str, relative_mp4_path: str | None = None) -> str | None:
     src_path = Path(settings.MEDIA_ROOT) / relative_webm_path
-    if not src_path.exists():
-        return None
-
     if relative_mp4_path is None:
         relative_mp4_path = str(Path(relative_webm_path).with_suffix(".mp4"))
     dst_path = Path(settings.MEDIA_ROOT) / relative_mp4_path
@@ -147,40 +145,64 @@ def convert_webm_to_mp4(relative_webm_path: str, relative_mp4_path: str | None =
     if temp_dst_path.exists():
         temp_dst_path.unlink()
 
-    try:
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-loglevel",
-                "error",
-                "-i",
-                str(src_path),
-                "-c:v",
-                "libx264",
-                "-vf",
-                "scale=trunc(iw/2)*2:trunc(ih/2)*2",
-                "-pix_fmt",
-                "yuv420p",
-                "-movflags",
-                "+faststart",
-                str(temp_dst_path),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except FileNotFoundError:
-        return None
-    except subprocess.CalledProcessError as exc:
-        if temp_dst_path.exists():
-            temp_dst_path.unlink()
+    previous_size = -1
+    stable_checks = 0
+    for _ in range(10):
+        if src_path.exists():
+            current_size = src_path.stat().st_size
+            if current_size > 0 and current_size == previous_size:
+                stable_checks += 1
+                if stable_checks >= 2:
+                    break
+            else:
+                stable_checks = 0
+            previous_size = current_size
+        time.sleep(0.5)
+
+    if not src_path.exists():
         error_log_path = dst_path.with_suffix(".ffmpeg.log")
-        error_log_path.write_text(exc.stderr or exc.stdout or "ffmpeg conversion failed")
+        error_log_path.write_text(f"source recording not found: {src_path}")
         return None
 
-    temp_dst_path.replace(dst_path)
-    return relative_mp4_path
+    last_error = ""
+    for _ in range(3):
+        try:
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-loglevel",
+                    "error",
+                    "-i",
+                    str(src_path),
+                    "-c:v",
+                    "libx264",
+                    "-vf",
+                    "scale=trunc(iw/2)*2:trunc(ih/2)*2",
+                    "-pix_fmt",
+                    "yuv420p",
+                    "-movflags",
+                    "+faststart",
+                    str(temp_dst_path),
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            temp_dst_path.replace(dst_path)
+            return relative_mp4_path
+        except FileNotFoundError:
+            last_error = "ffmpeg executable not found"
+            break
+        except subprocess.CalledProcessError as exc:
+            last_error = exc.stderr or exc.stdout or "ffmpeg conversion failed"
+            if temp_dst_path.exists():
+                temp_dst_path.unlink()
+            time.sleep(1)
+
+    error_log_path = dst_path.with_suffix(".ffmpeg.log")
+    error_log_path.write_text(last_error or "ffmpeg conversion failed")
+    return None
 
 
 def remove_stale_partial_file(relative_mp4_path: str) -> None:
