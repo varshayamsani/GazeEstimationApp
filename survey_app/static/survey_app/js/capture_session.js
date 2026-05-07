@@ -14,6 +14,8 @@
   const controlChannel = "BroadcastChannel" in window ? new BroadcastChannel("survey-capture-control") : null;
   let openerWatchTimer = null;
   let openerClosedChecks = 0;
+  let heartbeatWatchTimer = null;
+  let lastHeartbeatAt = Date.now();
   const activeStreams = [];
 
   const setStatus = (message, isError = false) => {
@@ -162,6 +164,10 @@
 
   if (controlChannel) {
     controlChannel.addEventListener("message", (event) => {
+      if (event.data?.type === "survey-heartbeat") {
+        lastHeartbeatAt = Date.now();
+        return;
+      }
       void handleStopMessage(event.data);
     });
   }
@@ -184,6 +190,23 @@
         stopAllRecorders();
         window.close();
       }
+    }, 1000);
+  }
+
+  if (controlChannel) {
+    heartbeatWatchTimer = window.setInterval(() => {
+      if (Date.now() - lastHeartbeatAt < 4500) {
+        return;
+      }
+      void stopAllRecorders().finally(() => {
+        if (openerWatchTimer) {
+          window.clearInterval(openerWatchTimer);
+        }
+        if (heartbeatWatchTimer) {
+          window.clearInterval(heartbeatWatchTimer);
+        }
+        window.close();
+      });
     }, 1000);
   }
 

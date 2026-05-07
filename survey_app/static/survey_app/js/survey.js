@@ -10,6 +10,7 @@
   const searchParams = new URLSearchParams(window.location.search);
   const shouldStartCapture = searchParams.get("start_capture") === "1";
   const controlChannel = "BroadcastChannel" in window ? new BroadcastChannel("survey-capture-control") : null;
+  let heartbeatTimer = null;
   let autoScrollTimer = null;
   let isAnimating = false;
   let selectedRating = Number.parseFloat(ratingChoiceInput?.value || "0") || 0;
@@ -196,6 +197,25 @@
       }
       window.location.href = thankYouUrl;
     });
+  }
+
+  if (controlChannel && (shouldStartCapture || sessionStorage.getItem("captureWindowStarted"))) {
+    const sendHeartbeat = () => {
+      controlChannel.postMessage({ type: "survey-heartbeat" });
+    };
+
+    sendHeartbeat();
+    heartbeatTimer = window.setInterval(sendHeartbeat, 1000);
+
+    const stopHeartbeat = () => {
+      if (heartbeatTimer) {
+        window.clearInterval(heartbeatTimer);
+        heartbeatTimer = null;
+      }
+    };
+
+    window.addEventListener("pagehide", stopHeartbeat);
+    window.addEventListener("beforeunload", stopHeartbeat);
   }
 
   if (isThankYouPage && sessionStorage.getItem("captureWindowStarted")) {
