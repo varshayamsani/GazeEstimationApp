@@ -13,6 +13,7 @@
   const pendingFinalizations = [];
   let stoppedAll = false;
   const controlChannel = "BroadcastChannel" in window ? new BroadcastChannel("survey-capture-control") : null;
+  const debugCloseDelayMs = 10000;
   let openerWatchTimer = null;
   let openerClosedChecks = 0;
   let heartbeatWatchTimer = null;
@@ -154,7 +155,9 @@
       if (openerWatchTimer) {
         window.clearInterval(openerWatchTimer);
       }
-      window.close();
+      window.setTimeout(() => {
+        window.close();
+      }, debugCloseDelayMs);
     }
   };
 
@@ -208,7 +211,9 @@
         if (heartbeatWatchTimer) {
           window.clearInterval(heartbeatWatchTimer);
         }
-        window.close();
+        window.setTimeout(() => {
+          window.close();
+        }, debugCloseDelayMs);
       });
     }, 1000);
   }
