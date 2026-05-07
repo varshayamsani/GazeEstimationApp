@@ -47,6 +47,15 @@ def get_or_create_participant(request: HttpRequest) -> ParticipantSession:
     return participant
 
 
+def get_recording_participant(request: HttpRequest) -> ParticipantSession:
+    participant_id = request.POST.get("participant_id")
+    if participant_id:
+        participant = ParticipantSession.objects.filter(id=participant_id).first()
+        if participant:
+            return participant
+    return get_or_create_participant(request)
+
+
 def get_onboarding_redirect(participant: ParticipantSession, request: HttpRequest) -> str | None:
     if not request.session.get("participant_id"):
         return "survey_app:welcome"
@@ -906,12 +915,19 @@ def capture_session_view(request: HttpRequest) -> HttpResponse:
     if not participant.consent_given:
         return redirect("survey_app:consent")
 
-    return render(request, "survey_app/capture_session.html", {"record_webcam": False})
+    return render(
+        request,
+        "survey_app/capture_session.html",
+        {
+            "record_webcam": False,
+            "participant_id": participant.id,
+        },
+    )
 
 
 @require_POST
 def upload_webcam_clip(request: HttpRequest) -> HttpResponse:
-    participant = get_or_create_participant(request)
+    participant = get_recording_participant(request)
     if not participant.consent_given:
         return HttpResponseForbidden("Consent required")
 
@@ -927,7 +943,7 @@ def upload_webcam_clip(request: HttpRequest) -> HttpResponse:
 
 @require_POST
 def upload_screen_clip(request: HttpRequest) -> HttpResponse:
-    participant = get_or_create_participant(request)
+    participant = get_recording_participant(request)
     if not participant.consent_given:
         return HttpResponseForbidden("Consent required")
 
@@ -943,7 +959,7 @@ def upload_screen_clip(request: HttpRequest) -> HttpResponse:
 
 @require_POST
 def finalize_webcam_clip(request: HttpRequest) -> HttpResponse:
-    participant = get_or_create_participant(request)
+    participant = get_recording_participant(request)
     if not participant.consent_given:
         return HttpResponseForbidden("Consent required")
 
@@ -969,7 +985,7 @@ def finalize_webcam_clip(request: HttpRequest) -> HttpResponse:
 
 @require_POST
 def finalize_screen_clip(request: HttpRequest) -> HttpResponse:
-    participant = get_or_create_participant(request)
+    participant = get_recording_participant(request)
     if not participant.consent_given:
         return HttpResponseForbidden("Consent required")
 

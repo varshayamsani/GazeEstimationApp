@@ -1,5 +1,6 @@
 (() => {
   const captureStatus = document.getElementById("captureStatus");
+  const participantId = document.body?.dataset?.participantId || "";
   const csrfToken = document.cookie
     .split(";")
     .map((value) => value.trim())
@@ -30,6 +31,7 @@
     const formData = new FormData();
     formData.append("clip", blob, `${filenamePrefix}-${sessionStamp}.webm`);
     formData.append("session_stamp", String(sessionStamp));
+    formData.append("participant_id", participantId);
     formData.append("csrfmiddlewaretoken", csrfToken || "");
     const uploadPromise = fetch(endpoint, {
         method: "POST",
@@ -55,6 +57,7 @@
 
     const formData = new FormData();
     formData.append("session_stamp", String(sessionStamp));
+    formData.append("participant_id", participantId);
     formData.append("csrfmiddlewaretoken", csrfToken || "");
 
     let sent = false;

@@ -7,7 +7,7 @@
   {% load static %}
   <link rel="stylesheet" href="{% static 'survey_app/css/styles.css' %}">
 </head>
-<body class="capture-window">
+<body class="capture-window" data-participant-id="{{ participant_id }}">
   <main class="capture-window-shell">
     <section class="card capture-window-card">
       <h1>Recording Session</h1>
