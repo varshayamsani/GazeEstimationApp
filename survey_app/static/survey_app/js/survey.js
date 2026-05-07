@@ -6,6 +6,7 @@
   const ratingChoiceInput = document.getElementById("ratingChoiceInput");
   const endStudyBtn = document.querySelector(".end-study-btn");
   const thankYouUrl = "/thank-you/";
+  const isThankYouPage = window.location.pathname === thankYouUrl;
   const searchParams = new URLSearchParams(window.location.search);
   const shouldStartCapture = searchParams.get("start_capture") === "1";
   const controlChannel = "BroadcastChannel" in window ? new BroadcastChannel("survey-capture-control") : null;
@@ -195,6 +196,17 @@
       }
       window.location.href = thankYouUrl;
     });
+  }
+
+  if (isThankYouPage && sessionStorage.getItem("captureWindowStarted")) {
+    // The study completes by navigating directly to /thank-you/, so stop the
+    // capture popup automatically and let it finalize pending uploads.
+    window.setTimeout(() => {
+      sessionStorage.removeItem("captureWindowStarted");
+      if (controlChannel) {
+        controlChannel.postMessage({ type: "stop-capture-session" });
+      }
+    }, 500);
   }
 
   buildStarRating();
