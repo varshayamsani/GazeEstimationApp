@@ -452,7 +452,7 @@ def reading_habits_view(request: HttpRequest) -> HttpResponse:
         {
             "form": form,
             "record_webcam": False,
-            "load_survey_js": False,
+            "load_survey_js": True,
         },
     )
 
@@ -498,7 +498,7 @@ def media_preferences_view(request: HttpRequest) -> HttpResponse:
         {
             "form": form,
             "record_webcam": False,
-            "load_survey_js": False,
+            "load_survey_js": True,
         },
     )
 
