@@ -16,6 +16,7 @@ ALLOWED_HOSTS = [
     "172.17.41.28",
     "172.16.203.16",
     ".trycloudflare.com",
+"imprint-overcoat-muskiness.ngrok-free.dev",
 ]
 extra_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "")
 if extra_hosts:
@@ -23,6 +24,7 @@ if extra_hosts:
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.trycloudflare.com",
+"https://imprint-overcoat-muskiness.ngrok-free.dev",
 ]
 CSRF_COOKIE_SAMESITE = os.environ.get("DJANGO_CSRF_COOKIE_SAMESITE", "Lax")
 CSRF_COOKIE_SECURE = os.environ.get("DJANGO_CSRF_COOKIE_SECURE", "False").lower() == "true"
